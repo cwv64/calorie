@@ -1,0 +1,24 @@
+{
+  "name": "Daily Calorie Tracker",
+  "short_name": "Calorie Tracker",
+  "description": "Track your daily calories, protein, and fiber intake across all your devices",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/JhYCyOE.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.imgur.com/JhYCyOE.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
