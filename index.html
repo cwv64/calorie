@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Calorie Tracker (LocalStorage)</title>
-    <link rel="icon" type="image/png" href="https://i.imgur.com/JhYCyOE.png"> <script src="https://cdn.tailwindcss.com"></script>
+    <title>Daily Calorie Tracker (Firebase)</title>
+    <link rel="icon" type="image/png" href="https://i.imgur.com/JhYCyOE.png">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -31,44 +32,43 @@
 
         /* Calendar Styles */
         .calendar-day-cell {
-            border: 1px solid #e2e8f0; /* gray-300 */
+            border: 1px solid #e2e8f0;
             padding: 4px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
         .calendar-month-view .calendar-day-cell {
-             min-height: 90px; /* For month view cells */
+             min-height: 90px;
         }
         .calendar-week-view .calendar-day-cell {
-            min-height: 60px; /* For week view list items */
-            margin-bottom: 2px; /* Add some space between days in week view */
+            min-height: 60px;
+            margin-bottom: 2px;
         }
         .calendar-day-cell:hover {
-            background-color: #f0f4f8; /* lighter indigo/blue */
+            background-color: #f0f4f8;
         }
         .calendar-day-cell.other-month {
-            background-color: #f7fafc; /* gray-100 */
-            color: #a0aec0; /* gray-500 */
+            background-color: #f7fafc;
+            color: #a0aec0;
         }
         .calendar-day-cell.is-today {
-            background-color: #ebf4ff; /* blue-100 */
-            border: 1px solid #90cdf4; /* blue-300 */
+            background-color: #ebf4ff;
+            border: 1px solid #90cdf4;
         }
         .calendar-day-cell.is-current-dashboard-date {
-            box-shadow: inset 0 0 0 2px #667eea; /* indigo-500 */
+            box-shadow: inset 0 0 0 2px #667eea;
         }
-        .calendar-day-header-label { /* For Sun-Sat labels */
+        .calendar-day-header-label {
             font-weight: 600;
-            color: #4a5568; /* gray-700 */
+            color: #4a5568;
             padding-bottom: 4px;
         }
         .cal-data { font-size: 0.75rem; margin-top: 2px; }
         .cal-data-value { font-weight: 500; }
-        .cal-data-cal { color: #38a169; /* green-600 */ }
-        .cal-data-prot { color: #3182ce; /* blue-600 */ }
-        .cal-data-fib { color: #dd6b20; /* orange-600 */ }
+        .cal-data-cal { color: #38a169; }
+        .cal-data-prot { color: #3182ce; }
+        .cal-data-fib { color: #dd6b20; }
 
-        /* Week view specific cell content styling */
         .week-view-cell-content {
             display: flex;
             justify-content: space-between;
@@ -80,6 +80,14 @@
         }
         .week-view-stats {
             text-align: right;
+        }
+
+        /* Auth styles */
+        .auth-container {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -97,10 +105,38 @@
         </div>
     </div>
 
-    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+    <!-- Auth View (shown when not logged in) -->
+    <div id="authView" class="container mx-auto p-4 md:p-8 max-w-4xl" style="display: none;">
         <header class="mb-8 text-center">
             <h1 class="text-4xl font-bold text-indigo-700">Daily Calorie Tracker</h1>
-            <p class="text-sm text-gray-500 mt-1">Data saved locally in your browser.</p>
+            <p class="text-sm text-gray-500 mt-1">Sign in to sync your data across devices</p>
+        </header>
+        <div class="auth-container bg-white p-8 rounded-xl shadow-lg">
+            <div class="text-center">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800">Welcome!</h2>
+                <p class="text-gray-600 mb-8">Sign in with Google to access your calorie tracker from any device.</p>
+                <button id="signInButton" class="bg-white border border-gray-300 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 font-medium flex items-center justify-center mx-auto">
+                    <svg class="w-6 h-6 mr-2" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign in with Google
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App View (shown when logged in) -->
+    <div id="appView" class="container mx-auto p-4 md:p-8 max-w-4xl" style="display: none;">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-indigo-700">Daily Calorie Tracker</h1>
+            <p class="text-sm text-gray-500 mt-1">Data synced across all your devices</p>
+            <div class="mt-4 flex items-center justify-center gap-4">
+                <span id="userEmail" class="text-sm text-gray-600"></span>
+                <button id="signOutButton" class="text-sm bg-gray-200 text-gray-700 py-1 px-4 rounded-md hover:bg-gray-300">Sign Out</button>
+            </div>
         </header>
 
         <nav class="mb-8 flex justify-center space-x-2 md:space-x-4">
@@ -124,7 +160,8 @@
             </section>
             <section class="bg-white p-6 rounded-xl shadow-lg">
                 <h3 class="text-xl font-semibold mb-4 text-indigo-600">Progress for <span id="progressDateDisplay">...</span></h3>
-                <div class="space-y-4"> <div>
+                <div class="space-y-4">
+                    <div>
                         <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
                             <span>Calories</span>
                             <span>Consumed: <span id="totalCalories" class="font-semibold">0</span> / <span id="calorieGoalDisplay" class="font-semibold">2000</span> kcal</span>
@@ -177,35 +214,72 @@
                     </div>
                 </div>
                 <div id="calendarGridContainer">
-                    <div id="calendarGrid" class="bg-gray-200 border border-gray-200">
-                        </div>
+                    <div id="calendarGrid" class="bg-gray-200 border border-gray-200"></div>
                 </div>
             </section>
         </main>
 
         <main id="settingsView" class="space-y-6" style="display: none;">
-            <section class="bg-white p-6 rounded-xl shadow-lg"><h2 class="text-2xl font-semibold mb-6 text-indigo-600">Daily Goals</h2><form id="settingsForm" class="space-y-6"><div><label for="calorieGoalInput" class="block text-sm font-medium text-gray-700">Daily Calorie Goal (kcal)</label><input type="number" id="calorieGoalInput" name="calorieGoalInput" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div><div><label for="proteinGoalInput" class="block text-sm font-medium text-gray-700">Daily Protein Goal (g)</label><input type="number" id="proteinGoalInput" name="proteinGoalInput" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div><div><label for="fiberGoalInput" class="block text-sm font-medium text-gray-700">Daily Fiber Goal (g)</label><input type="number" id="fiberGoalInput" name="fiberGoalInput" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div><button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Save Goals</button></form></section>
+            <section class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-6 text-indigo-600">Daily Goals</h2>
+                <form id="settingsForm" class="space-y-6">
+                    <div><label for="calorieGoalInput" class="block text-sm font-medium text-gray-700">Daily Calorie Goal (kcal)</label><input type="number" id="calorieGoalInput" name="calorieGoalInput" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
+                    <div><label for="proteinGoalInput" class="block text-sm font-medium text-gray-700">Daily Protein Goal (g)</label><input type="number" id="proteinGoalInput" name="proteinGoalInput" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
+                    <div><label for="fiberGoalInput" class="block text-sm font-medium text-gray-700">Daily Fiber Goal (g)</label><input type="number" id="fiberGoalInput" name="fiberGoalInput" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Save Goals</button>
+                </form>
+            </section>
         </main>
 
-        <footer class="mt-12 text-center text-sm text-gray-500"><p>&copy; <span id="currentYear"></span> Calorie Tracker. All rights reserved.</p><script>document.getElementById('currentYear').textContent = new Date().getFullYear();</script></footer>
+        <footer class="mt-12 text-center text-sm text-gray-500">
+            <p>&copy; <span id="currentYear"></span> Calorie Tracker. All rights reserved.</p>
+            <script>document.getElementById('currentYear').textContent = new Date().getFullYear();</script>
+        </footer>
     </div>
 
+    <!-- Firebase Scripts -->
     <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgf1yYmAgmLB7GSqzUYYNQBZOinfrwD0Y",
+            authDomain: "calorie-c79d0.firebaseapp.com",
+            projectId: "calorie-c79d0",
+            storageBucket: "calorie-c79d0.firebasestorage.app",
+            messagingSenderId: "916946762046",
+            appId: "1:916946762046:web:9876dac3b215680ffbd46f",
+            measurementId: "G-2ZH133D0Y7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
         // --- App State ---
+        let currentUser = null;
         let currentView = 'dashboard';
         let dailyGoals = { calories: 2000, protein: 100, fiber: 30 };
         let foodLog = [];
         let currentDate = new Date().toISOString().split('T')[0];
-
         let calendarDisplayDate = new Date();
         let calendarMode = 'month';
         const todayString = new Date().toISOString().split('T')[0];
 
-        // --- LocalStorage Keys ---
-        const GOALS_STORAGE_KEY = 'calorieTrackerGoals';
-        const FOOD_LOG_STORAGE_KEY_PREFIX = 'calorieTrackerFoodLog_';
+        // Cache for calendar data
+        let calendarDataCache = {};
 
         // --- UI Elements ---
+        const authView = document.getElementById('authView');
+        const appView = document.getElementById('appView');
+        const signInButton = document.getElementById('signInButton');
+        const signOutButton = document.getElementById('signOutButton');
+        const userEmail = document.getElementById('userEmail');
+
         const dashboardView = document.getElementById('dashboardView');
         const calendarView = document.getElementById('calendarView');
         const settingsView = document.getElementById('settingsView');
@@ -239,7 +313,6 @@
         const remainingProtein = document.getElementById('remainingProtein');
         const remainingFiber = document.getElementById('remainingFiber');
 
-
         const calorieGoalInput = document.getElementById('calorieGoalInput');
         const proteinGoalInput = document.getElementById('proteinGoalInput');
         const fiberGoalInput = document.getElementById('fiberGoalInput');
@@ -264,97 +337,163 @@
         function hideMessage() { messageModal.classList.add('hidden'); }
         function formatDateToYyyyMmDd(dateObj) { return dateObj.toISOString().split('T')[0]; }
 
-        // --- LocalStorage Functions ---
-        function loadGoalsFromLocalStorage() {
+        // --- Authentication Functions ---
+        async function handleSignIn() {
+            try {
+                showLoading(true);
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Sign in error:", error);
+                showMessage("Failed to sign in. Please try again.");
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function handleSignOut() {
+            try {
+                showLoading(true);
+                await signOut(auth);
+                showMessage("Signed out successfully");
+            } catch (error) {
+                console.error("Sign out error:", error);
+                showMessage("Failed to sign out. Please try again.");
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // --- Firestore Functions ---
+        async function loadGoalsFromFirestore() {
+            if (!currentUser) return;
             showLoading(true);
             try {
-                const storedGoals = localStorage.getItem(GOALS_STORAGE_KEY);
-                if (storedGoals) { dailyGoals = JSON.parse(storedGoals); }
-            } catch (error) { console.error("Error loading goals:", error); showMessage("Could not load goals."); dailyGoals = { calories: 2000, protein: 100, fiber: 30 };}
+                const goalsDoc = await getDoc(doc(db, 'users', currentUser.uid, 'settings', 'goals'));
+                if (goalsDoc.exists()) {
+                    dailyGoals = goalsDoc.data();
+                } else {
+                    // Set default goals
+                    await setDoc(doc(db, 'users', currentUser.uid, 'settings', 'goals'), dailyGoals);
+                }
+            } catch (error) {
+                console.error("Error loading goals:", error);
+                showMessage("Could not load goals.");
+            }
             updateSettingsForm();
             showLoading(false);
         }
-        function saveGoalsToLocalStorage() {
+
+        async function saveGoalsToFirestore() {
+            if (!currentUser) return;
             showLoading(true);
-            try { localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(dailyGoals)); showMessage("Goals updated!"); }
-            catch (error) { console.error("Error saving goals:", error); showMessage(`Error saving goals: ${error.message}`); }
+            try {
+                await setDoc(doc(db, 'users', currentUser.uid, 'settings', 'goals'), dailyGoals);
+                showMessage("Goals updated!");
+            } catch (error) {
+                console.error("Error saving goals:", error);
+                showMessage(`Error saving goals: ${error.message}`);
+            }
             updateDashboardSummary();
-            if(currentView === 'calendar') renderCalendar();
+            if (currentView === 'calendar') {
+                calendarDataCache = {}; // Clear cache
+                renderCalendar();
+            }
             showLoading(false);
         }
-        function getFoodLogStorageKey(dateString) { return `${FOOD_LOG_STORAGE_KEY_PREFIX}${dateString}`; }
 
-        function loadFoodLogForDateFromLocalStorage(dateString) {
+        async function loadFoodLogForDateFromFirestore(dateString) {
+            if (!currentUser) return;
             showLoading(true);
-            const storageKey = getFoodLogStorageKey(dateString);
             try {
-                const storedFoodLog = localStorage.getItem(storageKey);
-                foodLog = storedFoodLog ? JSON.parse(storedFoodLog) : [];
-            } catch (error) { console.error(`Error loading food log for ${dateString}:`, error); foodLog = []; }
+                const q = query(
+                    collection(db, 'users', currentUser.uid, 'foodLogs'),
+                    where('date', '==', dateString)
+                );
+                const querySnapshot = await getDocs(q);
+                foodLog = [];
+                querySnapshot.forEach((doc) => {
+                    foodLog.push({ id: doc.id, ...doc.data() });
+                });
+            } catch (error) {
+                console.error(`Error loading food log for ${dateString}:`, error);
+                foodLog = [];
+            }
             renderFoodLog();
             updateDashboardSummary();
             showLoading(false);
         }
 
-        function getDailyTotalsForDate(dateString) {
-            const storageKey = getFoodLogStorageKey(dateString);
-            let dailyFoodLog = [];
+        async function getDailyTotalsForDate(dateString) {
+            if (!currentUser) return { calories: 0, protein: 0, fiber: 0 };
+            
+            // Check cache first
+            if (calendarDataCache[dateString]) {
+                return calendarDataCache[dateString];
+            }
+
             try {
-                const storedFoodLog = localStorage.getItem(storageKey);
-                if (storedFoodLog) { dailyFoodLog = JSON.parse(storedFoodLog); }
-            } catch (error) { console.error(`Error loading food log for ${dateString} (calendar):`, error); }
-            let totals = { calories: 0, protein: 0, fiber: 0 };
-            dailyFoodLog.forEach(item => {
-                totals.calories += Number(item.calories) || 0;
-                totals.protein += Number(item.protein) || 0;
-                totals.fiber += Number(item.fiber) || 0;
-            });
-            return totals;
+                const q = query(
+                    collection(db, 'users', currentUser.uid, 'foodLogs'),
+                    where('date', '==', dateString)
+                );
+                const querySnapshot = await getDocs(q);
+                let totals = { calories: 0, protein: 0, fiber: 0 };
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    totals.calories += Number(data.calories) || 0;
+                    totals.protein += Number(data.protein) || 0;
+                    totals.fiber += Number(data.fiber) || 0;
+                });
+                
+                // Cache the result
+                calendarDataCache[dateString] = totals;
+                return totals;
+            } catch (error) {
+                console.error(`Error loading totals for ${dateString}:`, error);
+                return { calories: 0, protein: 0, fiber: 0 };
+            }
         }
 
-        function saveFoodLogToLocalStorage(dateString, currentDayFoodLog) {
-            const storageKey = getFoodLogStorageKey(dateString);
-            try { localStorage.setItem(storageKey, JSON.stringify(currentDayFoodLog)); }
-            catch (error) { console.error(`Error saving food log for ${dateString}:`, error); showMessage(`Error saving food log: ${error.message}`);}
-        }
-
-        function addFoodItemToLocalStorage(foodItem) {
+        async function addFoodItemToFirestore(foodItem) {
+            if (!currentUser) return;
             showLoading(true);
-            const newItem = { ...foodItem, id: Date.now().toString() };
-            let currentDayLog = [];
-            const storageKey = getFoodLogStorageKey(currentDate);
             try {
-                const stored = localStorage.getItem(storageKey);
-                if(stored) currentDayLog = JSON.parse(stored);
-            } catch (e) { console.error("Error reading log before adding:", e); }
-
-            currentDayLog.push(newItem);
-            saveFoodLogToLocalStorage(currentDate, currentDayLog);
-
-            foodLog = currentDayLog;
-            renderFoodLog();
-            updateDashboardSummary();
-            if (currentView === 'calendar') renderCalendar();
+                const docRef = doc(collection(db, 'users', currentUser.uid, 'foodLogs'));
+                const newItem = {
+                    ...foodItem,
+                    date: currentDate,
+                    timestamp: new Date().toISOString()
+                };
+                await setDoc(docRef, newItem);
+                
+                // Clear cache for this date
+                delete calendarDataCache[currentDate];
+                
+                await loadFoodLogForDateFromFirestore(currentDate);
+                if (currentView === 'calendar') renderCalendar();
+            } catch (error) {
+                console.error("Error adding food item:", error);
+                showMessage(`Error adding food item: ${error.message}`);
+            }
             showLoading(false);
         }
 
-        function deleteFoodItemFromLocalStorage(foodItemId) {
+        async function deleteFoodItemFromFirestore(foodItemId) {
+            if (!currentUser) return;
             showLoading(true);
-            let currentDayLog = [];
-            const storageKey = getFoodLogStorageKey(currentDate);
             try {
-                const stored = localStorage.getItem(storageKey);
-                if(stored) currentDayLog = JSON.parse(stored);
-            } catch (e) { console.error("Error reading log before deleting:", e); showLoading(false); return; }
-
-            currentDayLog = currentDayLog.filter(item => item.id !== foodItemId);
-            saveFoodLogToLocalStorage(currentDate, currentDayLog);
-
-            foodLog = currentDayLog;
-            renderFoodLog();
-            updateDashboardSummary();
-            if (currentView === 'calendar') renderCalendar();
-            console.log("Food item deleted:", foodItemId);
+                await deleteDoc(doc(db, 'users', currentUser.uid, 'foodLogs', foodItemId));
+                
+                // Clear cache for this date
+                delete calendarDataCache[currentDate];
+                
+                await loadFoodLogForDateFromFirestore(currentDate);
+                if (currentView === 'calendar') renderCalendar();
+                console.log("Food item deleted:", foodItemId);
+            } catch (error) {
+                console.error("Error deleting food item:", error);
+                showMessage(`Error deleting food item: ${error.message}`);
+            }
             showLoading(false);
         }
 
@@ -377,7 +516,7 @@
             calendarHeaderDisplay.textContent = headerText;
         }
 
-        function renderCalendar() {
+        async function renderCalendar() {
             showLoading(true);
             calendarGrid.innerHTML = '';
             const existingHeaders = calendarGridContainer.querySelector('.calendar-day-headers-row');
@@ -398,15 +537,15 @@
                     headerRow.appendChild(th);
                 });
                 calendarGridContainer.insertBefore(headerRow, calendarGrid);
-                renderMonthGrid();
+                await renderMonthGrid();
             } else {
                 calendarGrid.classList.add('calendar-week-view');
-                renderWeekGrid();
+                await renderWeekGrid();
             }
             showLoading(false);
         }
 
-        function renderMonthGrid() {
+        async function renderMonthGrid() {
             const year = calendarDisplayDate.getFullYear();
             const month = calendarDisplayDate.getMonth();
 
@@ -415,12 +554,30 @@
             const daysInMonth = lastDayOfMonth.getDate();
             let startingDayOfWeek = firstDayOfMonth.getDay();
 
+            // Collect all dates we need to fetch
+            const datesToFetch = [];
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cellDate = new Date(year, month, day);
+                const cellDateString = formatDateToYyyyMmDd(cellDate);
+                datesToFetch.push(cellDateString);
+            }
+
+            // Fetch all data in parallel
+            const dataPromises = datesToFetch.map(date => getDailyTotalsForDate(date));
+            const allData = await Promise.all(dataPromises);
+            const dataMap = {};
+            datesToFetch.forEach((date, index) => {
+                dataMap[date] = allData[index];
+            });
+
+            // Add empty cells before first day
             for (let i = 0; i < startingDayOfWeek; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'calendar-day-cell other-month bg-gray-50';
                 calendarGrid.appendChild(cell);
             }
 
+            // Render days
             for (let day = 1; day <= daysInMonth; day++) {
                 const cell = document.createElement('div');
                 const cellDate = new Date(year, month, day);
@@ -435,7 +592,7 @@
                 dayNumber.className = 'text-sm font-medium';
                 cell.appendChild(dayNumber);
 
-                const dailyTotals = getDailyTotalsForDate(cellDateString);
+                const dailyTotals = dataMap[cellDateString];
 
                 const calDisplay = document.createElement('span');
                 calDisplay.innerHTML = `<span class="cal-data-value">${dailyTotals.calories}</span> kcal`;
@@ -454,12 +611,14 @@
 
                 cell.onclick = () => {
                     currentDate = cellDateString;
-                    loadFoodLogForDateFromLocalStorage(currentDate);
+                    loadFoodLogForDateFromFirestore(currentDate);
                     updateDashboardDateDisplays();
                     switchView('dashboard');
                 };
                 calendarGrid.appendChild(cell);
             }
+
+            // Add empty cells after last day
             const totalCells = startingDayOfWeek + daysInMonth;
             const remainingCells = (7 - (totalCells % 7)) % 7;
             for (let i = 0; i < remainingCells; i++) {
@@ -469,13 +628,26 @@
             }
         }
 
-        function renderWeekGrid() {
+        async function renderWeekGrid() {
             const startOfWeek = new Date(calendarDisplayDate);
-
+            
+            // Collect dates for the week
+            const datesToFetch = [];
             for (let i = 0; i < 7; i++) {
                 const dayInWeek = new Date(startOfWeek);
                 dayInWeek.setDate(startOfWeek.getDate() + i);
-                const cellDateString = formatDateToYyyyMmDd(dayInWeek);
+                datesToFetch.push(formatDateToYyyyMmDd(dayInWeek));
+            }
+
+            // Fetch all data in parallel
+            const dataPromises = datesToFetch.map(date => getDailyTotalsForDate(date));
+            const allData = await Promise.all(dataPromises);
+
+            // Render cells
+            for (let i = 0; i < 7; i++) {
+                const dayInWeek = new Date(startOfWeek);
+                dayInWeek.setDate(startOfWeek.getDate() + i);
+                const cellDateString = datesToFetch[i];
 
                 const cell = document.createElement('div');
                 cell.className = 'calendar-day-cell';
@@ -492,7 +664,7 @@
 
                 const statsDiv = document.createElement('div');
                 statsDiv.className = 'week-view-stats';
-                const dailyTotals = getDailyTotalsForDate(cellDateString);
+                const dailyTotals = allData[i];
 
                 statsDiv.innerHTML = `
                     <span class="cal-data cal-data-cal"><span class="cal-data-value">${dailyTotals.calories}</span> kcal</span>
@@ -504,7 +676,7 @@
 
                 cell.onclick = () => {
                     currentDate = cellDateString;
-                    loadFoodLogForDateFromLocalStorage(currentDate);
+                    loadFoodLogForDateFromFirestore(currentDate);
                     updateDashboardDateDisplays();
                     switchView('dashboard');
                 };
@@ -553,7 +725,7 @@
                 updateSettingsForm();
             } else if (view === 'dashboard') {
                 updateDashboardDateDisplays();
-                loadFoodLogForDateFromLocalStorage(currentDate);
+                loadFoodLogForDateFromFirestore(currentDate);
             } else if (view === 'calendar') {
                 const [year, monthStr, dayStr] = currentDate.split('-');
                 calendarDisplayDate = new Date(Number(year), Number(monthStr) - 1, Number(dayStr));
@@ -566,12 +738,34 @@
         }
 
         function updateSettingsForm() {
-            calorieGoalInput.value = dailyGoals.calories; proteinGoalInput.value = dailyGoals.protein; fiberGoalInput.value = dailyGoals.fiber;
+            calorieGoalInput.value = dailyGoals.calories;
+            proteinGoalInput.value = dailyGoals.protein;
+            fiberGoalInput.value = dailyGoals.fiber;
         }
+
         function renderFoodLog() {
             foodLogTableBody.innerHTML = '';
-            if (foodLog.length === 0) { const row = foodLogTableBody.insertRow(); const cell = row.insertCell(); cell.colSpan = 5; cell.textContent = 'No food items logged for this day.'; cell.className = 'text-center py-4 text-gray-500'; return; }
-            foodLog.forEach(item => { const row = foodLogTableBody.insertRow(); row.insertCell().textContent = item.name; row.insertCell().textContent = item.calories; row.insertCell().textContent = item.protein; row.insertCell().textContent = item.fiber; const deleteButton = document.createElement('button'); deleteButton.textContent = 'Delete'; deleteButton.className = 'px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs'; deleteButton.onclick = () => deleteFoodItemFromLocalStorage(item.id); const actionsCell = row.insertCell(); actionsCell.appendChild(deleteButton); });
+            if (foodLog.length === 0) {
+                const row = foodLogTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 5;
+                cell.textContent = 'No food items logged for this day.';
+                cell.className = 'text-center py-4 text-gray-500';
+                return;
+            }
+            foodLog.forEach(item => {
+                const row = foodLogTableBody.insertRow();
+                row.insertCell().textContent = item.name;
+                row.insertCell().textContent = item.calories;
+                row.insertCell().textContent = item.protein;
+                row.insertCell().textContent = item.fiber;
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs';
+                deleteButton.onclick = () => deleteFoodItemFromFirestore(item.id);
+                const actionsCell = row.insertCell();
+                actionsCell.appendChild(deleteButton);
+            });
         }
 
         function updateDashboardSummary() {
@@ -606,6 +800,9 @@
         }
 
         // --- Event Handlers ---
+        signInButton.addEventListener('click', handleSignIn);
+        signOutButton.addEventListener('click', handleSignOut);
+
         foodForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const newFood = {
@@ -614,8 +811,11 @@
                 protein: parseInt(proteinInput.value) || 0,
                 fiber: parseInt(fiberInput.value) || 0,
             };
-            if (!newFood.name) { showMessage("Please enter a food name."); return; }
-            addFoodItemToLocalStorage(newFood);
+            if (!newFood.name) {
+                showMessage("Please enter a food name.");
+                return;
+            }
+            addFoodItemToFirestore(newFood);
             foodForm.reset();
         });
 
@@ -624,7 +824,7 @@
             dailyGoals.calories = parseInt(calorieGoalInput.value) || 0;
             dailyGoals.protein = parseInt(proteinGoalInput.value) || 0;
             dailyGoals.fiber = parseInt(fiberGoalInput.value) || 0;
-            saveGoalsToLocalStorage();
+            saveGoalsToFirestore();
         });
 
         viewDashboardButton.addEventListener('click', () => switchView('dashboard'));
@@ -642,6 +842,7 @@
             calendarDisplayDate = new Date(Number(year), Number(monthStr) - 1, Number(dayStr));
             renderCalendar();
         });
+
         calendarWeekViewBtn.addEventListener('click', () => {
             calendarMode = 'week';
             calendarWeekViewBtn.classList.add('bg-indigo-700', 'text-white');
@@ -662,33 +863,48 @@
             } else {
                 calendarDisplayDate.setDate(calendarDisplayDate.getDate() - 7);
             }
+            calendarDataCache = {}; // Clear cache when navigating
             renderCalendar();
         });
+
         calendarNextBtn.addEventListener('click', () => {
             if (calendarMode === 'month') {
                 calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
             } else {
                 calendarDisplayDate.setDate(calendarDisplayDate.getDate() + 7);
             }
+            calendarDataCache = {}; // Clear cache when navigating
             renderCalendar();
         });
+
         calendarTodayBtn.addEventListener('click', () => {
             calendarDisplayDate = new Date();
-             if (calendarMode === 'week') {
+            if (calendarMode === 'week') {
                 const dayOfWeek = calendarDisplayDate.getDay();
                 calendarDisplayDate.setDate(calendarDisplayDate.getDate() - dayOfWeek);
             }
+            calendarDataCache = {}; // Clear cache when navigating
             renderCalendar();
         });
 
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', () => {
-            loadGoalsFromLocalStorage();
-            loadFoodLogForDateFromLocalStorage(currentDate);
-
-            updateDashboardDateDisplays();
-            switchView('dashboard');
-            updateSettingsForm();
+        // --- Auth State Observer ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                userEmail.textContent = user.email;
+                authView.style.display = 'none';
+                appView.style.display = 'block';
+                
+                // Load user data
+                await loadGoalsFromFirestore();
+                await loadFoodLogForDateFromFirestore(currentDate);
+                updateDashboardDateDisplays();
+                switchView('dashboard');
+            } else {
+                currentUser = null;
+                authView.style.display = 'block';
+                appView.style.display = 'none';
+            }
         });
     </script>
 </body>
