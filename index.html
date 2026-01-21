@@ -25,64 +25,188 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7f6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-        .progress-bar-bg { background-color: #e0e0e0; }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 2rem;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+        }
+        
+        .progress-bar-bg { 
+            background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 100%);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+        }
+        
         .progress-bar {
-            transition: width 0.3s ease-in-out;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
             color: white;
             font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
+        
+        .progress-bar.bg-green-500 {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        }
+        
+        .progress-bar.bg-blue-500 {
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        .progress-bar.bg-yellow-500 {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+        }
+        
         .nav-button, .cal-view-btn, .cal-nav-btn {
-            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
         }
+        
+        .nav-button:hover, .cal-view-btn:hover, .cal-nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
         .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
         }
-        .modal-content { max-width: 90%; }
-        @media (min-width: 640px) { .modal-content { max-width: 500px; } }
+        
+        .modal-content { 
+            max-width: 90%;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        @media (min-width: 640px) { 
+            .modal-content { max-width: 500px; } 
+        }
+
+        /* Header styles */
+        h1 {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Input styles */
+        input, select, textarea {
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        
+        /* Button styles */
+        button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .bg-indigo-600 {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        }
+        
+        .bg-indigo-600:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        }
+        
+        .bg-indigo-700 {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        }
 
         /* Calendar Styles */
         .calendar-day-cell {
-            border: 1px solid #e2e8f0;
-            padding: 4px;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            padding: 8px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
         }
+        
         .calendar-month-view .calendar-day-cell {
              min-height: 90px;
+             margin: 4px;
         }
+        
         .calendar-week-view .calendar-day-cell {
             min-height: 60px;
-            margin-bottom: 2px;
+            margin-bottom: 8px;
         }
+        
         .calendar-day-cell:hover {
-            background-color: #f0f4f8;
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
         }
+        
         .calendar-day-cell.other-month {
-            background-color: #f7fafc;
+            background: rgba(247, 250, 252, 0.5);
             color: #a0aec0;
         }
+        
         .calendar-day-cell.is-today {
-            background-color: #ebf4ff;
-            border: 1px solid #90cdf4;
+            background: linear-gradient(135deg, #ebf4ff 0%, #dbeafe 100%);
+            border: 2px solid #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
+        
         .calendar-day-cell.is-current-dashboard-date {
-            box-shadow: inset 0 0 0 2px #667eea;
+            box-shadow: inset 0 0 0 3px #6366f1, 0 4px 12px rgba(99, 102, 241, 0.3);
         }
+        
         .calendar-day-header-label {
-            font-weight: 600;
-            color: #4a5568;
-            padding-bottom: 4px;
+            font-weight: 700;
+            color: #1f2937;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
         }
-        .cal-data { font-size: 0.75rem; margin-top: 2px; }
-        .cal-data-value { font-weight: 500; }
-        .cal-data-cal { color: #38a169; }
-        .cal-data-prot { color: #3182ce; }
-        .cal-data-fib { color: #dd6b20; }
+        
+        .cal-data { 
+            font-size: 0.75rem; 
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        
+        .cal-data-value { font-weight: 700; }
+        .cal-data-cal { color: #059669; }
+        .cal-data-prot { color: #2563eb; }
+        .cal-data-fib { color: #d97706; }
 
         .week-view-cell-content {
             display: flex;
@@ -90,9 +214,11 @@
             align-items: center;
             width: 100%;
         }
+        
         .week-view-day-info {
-            font-weight: 500;
+            font-weight: 600;
         }
+        
         .week-view-stats {
             text-align: right;
         }
@@ -103,6 +229,40 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        
+        /* Table styles */
+        table {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        /* Loading spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Form focus states */
+        .focus\:ring-indigo-500:focus {
+            --tw-ring-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 0 3px var(--tw-ring-color);
         }
     </style>
 </head>
@@ -123,10 +283,10 @@
     <!-- Auth View (shown when not logged in) -->
     <div id="authView" class="container mx-auto p-4 md:p-8 max-w-4xl" style="display: none;">
         <header class="mb-8 text-center">
-            <h1 class="text-4xl font-bold text-indigo-700">Daily Calorie Tracker</h1>
-            <p class="text-sm text-gray-500 mt-1">Sign in to sync your data across devices</p>
+            <h1 class="text-5xl font-bold mb-2">Daily Calorie Tracker</h1>
+            <p class="text-white text-opacity-90 mt-2 text-lg">Sign in to sync your data across devices</p>
         </header>
-        <div class="auth-container bg-white p-8 rounded-xl shadow-lg">
+        <div class="auth-container glass-card p-8 shadow-2xl">
             <div class="text-center">
                 <h2 class="text-2xl font-semibold mb-6 text-gray-800">Welcome!</h2>
                 
@@ -179,24 +339,24 @@
     <!-- Main App View (shown when logged in) -->
     <div id="appView" class="container mx-auto p-4 md:p-8 max-w-4xl" style="display: none;">
         <header class="mb-8 text-center">
-            <h1 class="text-4xl font-bold text-indigo-700">Daily Calorie Tracker</h1>
-            <p class="text-sm text-gray-500 mt-1">Data synced across all your devices</p>
-            <div class="mt-4 flex items-center justify-center gap-4">
-                <span id="userEmail" class="text-sm text-gray-600"></span>
-                <button id="signOutButton" class="text-sm bg-gray-200 text-gray-700 py-1 px-4 rounded-md hover:bg-gray-300">Sign Out</button>
+            <h1 class="text-5xl font-bold mb-2">Daily Calorie Tracker</h1>
+            <p class="text-white text-opacity-90 mt-2 text-lg">Data synced across all your devices</p>
+            <div class="mt-6 flex items-center justify-center gap-4 flex-wrap">
+                <span id="userEmail" class="text-white text-opacity-80 text-sm px-4 py-2 bg-white bg-opacity-10 rounded-full backdrop-blur-sm"></span>
+                <button id="signOutButton" class="text-sm bg-white bg-opacity-20 text-white py-2 px-6 rounded-full hover:bg-opacity-30 backdrop-blur-sm font-medium transition-all">Sign Out</button>
             </div>
         </header>
 
         <nav class="mb-8 flex justify-center space-x-2 md:space-x-4">
-            <button id="viewDashboardButton" class="nav-button py-2 px-3 md:px-6 rounded-md font-semibold">Dashboard</button>
-            <button id="viewCalendarButton" class="nav-button py-2 px-3 md:px-6 rounded-md font-semibold bg-gray-200 text-gray-700">Calendar</button>
-            <button id="viewSettingsButton" class="nav-button py-2 px-3 md:px-6 rounded-md font-semibold bg-gray-200 text-gray-700">Settings</button>
+            <button id="viewDashboardButton" class="nav-button py-3 px-6 md:px-8 rounded-full font-semibold shadow-lg">Dashboard</button>
+            <button id="viewCalendarButton" class="nav-button py-3 px-6 md:px-8 rounded-full font-semibold bg-white bg-opacity-20 text-white backdrop-blur-sm">Calendar</button>
+            <button id="viewSettingsButton" class="nav-button py-3 px-6 md:px-8 rounded-full font-semibold bg-white bg-opacity-20 text-white backdrop-blur-sm">Settings</button>
         </nav>
 
         <main id="dashboardView" class="space-y-8">
-            <section class="bg-white p-6 rounded-xl shadow-lg">
-                <h2 id="currentDateDisplay" class="text-2xl font-semibold mb-4 text-indigo-600">Displaying: ...</h2>
-                <form id="foodForm" class="space-y-4">
+            <section class="glass-card p-8 shadow-xl">
+                <h2 id="currentDateDisplay" class="text-2xl font-bold mb-6 text-indigo-600">Displaying: ...</h2>
+                <form id="foodForm" class="space-y-5">
                     <div><label for="foodName" class="block text-sm font-medium text-gray-700">Food Item</label><input type="text" id="foodName" name="foodName" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div><label for="calories" class="block text-sm font-medium text-gray-700">Calories (kcal)</label><input type="number" id="calories" name="calories" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
@@ -206,49 +366,49 @@
                     <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add Food Item to <span id="addFoodButtonDate">Current Day</span></button>
                 </form>
             </section>
-            <section class="bg-white p-6 rounded-xl shadow-lg">
-                <h3 class="text-xl font-semibold mb-4 text-indigo-600">Progress for <span id="progressDateDisplay">...</span></h3>
-                <div class="space-y-4">
+            <section class="glass-card p-8 shadow-xl">
+                <h3 class="text-2xl font-bold mb-6 text-indigo-600">Progress for <span id="progressDateDisplay">...</span></h3>
+                <div class="space-y-6">
                     <div>
-                        <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                        <div class="flex justify-between text-sm font-semibold text-gray-700 mb-2">
                             <span>Calories</span>
-                            <span>Consumed: <span id="totalCalories" class="font-semibold">0</span> / <span id="calorieGoalDisplay" class="font-semibold">2000</span> kcal</span>
+                            <span>Consumed: <span id="totalCalories" class="font-bold text-green-600">0</span> / <span id="calorieGoalDisplay" class="font-bold">2000</span> kcal</span>
                         </div>
-                        <div class="mt-1 w-full progress-bar-bg rounded-full h-6 overflow-hidden">
-                            <div id="calorieProgress" class="progress-bar bg-green-500 h-6 rounded-full leading-6">0%</div>
+                        <div class="mt-2 w-full progress-bar-bg rounded-full h-8 overflow-hidden">
+                            <div id="calorieProgress" class="progress-bar bg-green-500 h-8 rounded-full leading-8 text-sm">0%</div>
                         </div>
-                        <div class="text-right text-xs text-gray-600 mt-1">Remaining: <span id="remainingCalories" class="font-semibold">2000</span> kcal</div>
+                        <div class="text-right text-sm text-gray-600 mt-2 font-medium">Remaining: <span id="remainingCalories" class="font-bold text-gray-800">2000</span> kcal</div>
                     </div>
                     <div>
-                        <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                        <div class="flex justify-between text-sm font-semibold text-gray-700 mb-2">
                             <span>Protein</span>
-                            <span>Consumed: <span id="totalProtein" class="font-semibold">0</span> / <span id="proteinGoalDisplay" class="font-semibold">100</span> g</span>
+                            <span>Consumed: <span id="totalProtein" class="font-bold text-blue-600">0</span> / <span id="proteinGoalDisplay" class="font-bold">100</span> g</span>
                         </div>
-                        <div class="mt-1 w-full progress-bar-bg rounded-full h-6 overflow-hidden">
-                            <div id="proteinProgress" class="progress-bar bg-blue-500 h-6 rounded-full leading-6">0%</div>
+                        <div class="mt-2 w-full progress-bar-bg rounded-full h-8 overflow-hidden">
+                            <div id="proteinProgress" class="progress-bar bg-blue-500 h-8 rounded-full leading-8 text-sm">0%</div>
                         </div>
-                        <div class="text-right text-xs text-gray-600 mt-1">Remaining: <span id="remainingProtein" class="font-semibold">100</span> g</div>
+                        <div class="text-right text-sm text-gray-600 mt-2 font-medium">Remaining: <span id="remainingProtein" class="font-bold text-gray-800">100</span> g</div>
                     </div>
                     <div>
-                        <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                        <div class="flex justify-between text-sm font-semibold text-gray-700 mb-2">
                             <span>Fiber</span>
-                            <span>Consumed: <span id="totalFiber" class="font-semibold">0</span> / <span id="fiberGoalDisplay" class="font-semibold">30</span> g</span>
+                            <span>Consumed: <span id="totalFiber" class="font-bold text-yellow-600">0</span> / <span id="fiberGoalDisplay" class="font-bold">30</span> g</span>
                         </div>
-                        <div class="mt-1 w-full progress-bar-bg rounded-full h-6 overflow-hidden">
-                            <div id="fiberProgress" class="progress-bar bg-yellow-500 h-6 rounded-full leading-6">0%</div>
+                        <div class="mt-2 w-full progress-bar-bg rounded-full h-8 overflow-hidden">
+                            <div id="fiberProgress" class="progress-bar bg-yellow-500 h-8 rounded-full leading-8 text-sm">0%</div>
                         </div>
-                        <div class="text-right text-xs text-gray-600 mt-1">Remaining: <span id="remainingFiber" class="font-semibold">30</span> g</div>
+                        <div class="text-right text-sm text-gray-600 mt-2 font-medium">Remaining: <span id="remainingFiber" class="font-bold text-gray-800">30</span> g</div>
                     </div>
                 </div>
             </section>
-            <section class="bg-white p-6 rounded-xl shadow-lg">
-                <h3 class="text-xl font-semibold mb-4 text-indigo-600">Logged Food Items for <span id="logDateDisplay">...</span></h3>
+            <section class="glass-card p-8 shadow-xl">
+                <h3 class="text-2xl font-bold mb-6 text-indigo-600">Logged Food Items for <span id="logDateDisplay">...</span></h3>
                 <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Food</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calories</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Protein (g)</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fiber (g)</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th></tr></thead><tbody id="foodLogTableBody" class="bg-white divide-y divide-gray-200"></tbody></table></div>
             </section>
         </main>
 
         <main id="calendarView" class="space-y-6" style="display: none;">
-            <section class="bg-white p-6 rounded-xl shadow-lg">
+            <section class="glass-card p-8 shadow-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
                     <div class="flex space-x-2 mb-2 sm:mb-0">
                         <button id="calendarMonthViewBtn" class="cal-view-btn py-2 px-4 rounded-md font-semibold">Month</button>
@@ -268,8 +428,8 @@
         </main>
 
         <main id="settingsView" class="space-y-6" style="display: none;">
-            <section class="bg-white p-6 rounded-xl shadow-lg">
-                <h2 class="text-2xl font-semibold mb-6 text-indigo-600">Daily Goals</h2>
+            <section class="glass-card p-8 shadow-xl">
+                <h2 class="text-3xl font-bold mb-8 text-indigo-600">Daily Goals</h2>
                 <form id="settingsForm" class="space-y-6">
                     <div><label for="calorieGoalInput" class="block text-sm font-medium text-gray-700">Daily Calorie Goal (kcal)</label><input type="number" id="calorieGoalInput" name="calorieGoalInput" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
                     <div><label for="proteinGoalInput" class="block text-sm font-medium text-gray-700">Daily Protein Goal (g)</label><input type="number" id="proteinGoalInput" name="proteinGoalInput" min="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
@@ -279,7 +439,7 @@
             </section>
         </main>
 
-        <footer class="mt-12 text-center text-sm text-gray-500">
+        <footer class="mt-16 text-center text-sm text-white text-opacity-70">
             <p>&copy; <span id="currentYear"></span> Calorie Tracker. All rights reserved.</p>
             <script>document.getElementById('currentYear').textContent = new Date().getFullYear();</script>
         </footer>
@@ -833,20 +993,23 @@
             calendarView.style.display = view === 'calendar' ? 'block' : 'none';
             settingsView.style.display = view === 'settings' ? 'block' : 'none';
 
-            viewDashboardButton.classList.toggle('bg-indigo-700', view === 'dashboard');
-            viewDashboardButton.classList.toggle('text-white', view === 'dashboard');
-            viewDashboardButton.classList.toggle('bg-gray-200', view !== 'dashboard');
-            viewDashboardButton.classList.toggle('text-gray-700', view !== 'dashboard');
+            viewDashboardButton.classList.toggle('bg-white', view === 'dashboard');
+            viewDashboardButton.classList.toggle('text-indigo-600', view === 'dashboard');
+            viewDashboardButton.classList.toggle('bg-white', view !== 'dashboard');
+            viewDashboardButton.classList.toggle('bg-opacity-20', view !== 'dashboard');
+            viewDashboardButton.classList.toggle('text-white', view !== 'dashboard');
 
-            viewCalendarButton.classList.toggle('bg-indigo-700', view === 'calendar');
-            viewCalendarButton.classList.toggle('text-white', view === 'calendar');
-            viewCalendarButton.classList.toggle('bg-gray-200', view !== 'calendar');
-            viewCalendarButton.classList.toggle('text-gray-700', view !== 'calendar');
+            viewCalendarButton.classList.toggle('bg-white', view === 'calendar');
+            viewCalendarButton.classList.toggle('text-indigo-600', view === 'calendar');
+            viewCalendarButton.classList.toggle('bg-white', view !== 'calendar');
+            viewCalendarButton.classList.toggle('bg-opacity-20', view !== 'calendar');
+            viewCalendarButton.classList.toggle('text-white', view !== 'calendar');
 
-            viewSettingsButton.classList.toggle('bg-indigo-700', view === 'settings');
-            viewSettingsButton.classList.toggle('text-white', view === 'settings');
-            viewSettingsButton.classList.toggle('bg-gray-200', view !== 'settings');
-            viewSettingsButton.classList.toggle('text-gray-700', view !== 'settings');
+            viewSettingsButton.classList.toggle('bg-white', view === 'settings');
+            viewSettingsButton.classList.toggle('text-indigo-600', view === 'settings');
+            viewSettingsButton.classList.toggle('bg-white', view !== 'settings');
+            viewSettingsButton.classList.toggle('bg-opacity-20', view !== 'settings');
+            viewSettingsButton.classList.toggle('text-white', view !== 'settings');
 
             if (view === 'settings') {
                 updateSettingsForm();
